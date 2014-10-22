@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+	<meta charset="UTF-8">
+	<title>Example</title>
+	<style>
+		html, body{
+			height: 100%;
+			width: 100%;
+		}
+
+		#container{
+			width: 80%;
+			height: 80%;
+			overflow: auto;
+			border: 5px solid #006cc4;
+		}
+	</style>
+	<script src="jQuery-2.0.3.js"></script>
+	<script src="../jQuery-image-zoom.js"></script>
+</head>
+<body>
+
+<div id="container" style="text-align: center;">
+	<img id="img" src="" alt=""/>
+</div>
+
+<script>
+	$(document).ready(function(){
+		var container = $("#container");
+		var img = $("#img");
+		var src = "demo.jpg";
+
+		var zoomer = new $.zoom({
+			container: container,
+			img: img,
+			src: src,
+			animate: 1500
+		});
+		zoomer.done(function(){
+			console.log("done");
+		});
+	});
+</script>
+
+</body>
+</html>
