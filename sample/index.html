@@ -31,13 +31,12 @@
 		var img = $("#img");
 		var src = "demo.jpg";
 
-		var zoomer = new $.zoom({
+		$.zoom({
 			container: container,
 			img: img,
 			src: src,
 			animate: 1500
-		});
-		zoomer.done(function(){
+		}, function(zoomer){
 			console.log("done");
 		});
 	});

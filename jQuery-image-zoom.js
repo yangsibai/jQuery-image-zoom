@@ -1,14 +1,14 @@
 /**
  * Created by massimo on 14/10/22.
  */
-(function($){
+(function ($) {
     //options = {
     //  src: "http://xxx.jpg",
     //  container: $("#containerId"),
     //  img: $("#imgId"),
     //  animate: 500
     // }
-    function zoom (options){
+    function zoom(options) {
         this.src = options.src;
         this.container = options.container;
         this.img = options.img;
@@ -29,9 +29,9 @@
     }
 
     //开始执行，完成后回调
-    zoom.prototype.done = function(cb){
+    zoom.prototype.done = function (cb) {
         var proxy = this; //代理this
-        this.getRealSize(function(){
+        this.getRealSize(function () {
             proxy.fixSize(); //修正尺寸
             proxy.loadImage();
             proxy.handleDblClick();
@@ -41,7 +41,7 @@
     };
 
     //获取缩放后点的坐标
-    zoom.prototype.getPosition = function (x, y){
+    zoom.prototype.getPosition = function (x, y) {
         return {
             x: x * this.ratio.x,
             y: y * this.ratio.y
@@ -49,14 +49,14 @@
     };
 
     //返回是否需要放大
-    zoom.prototype.needZoomIn = function (x, y){
+    zoom.prototype.needZoomIn = function (x, y) {
         return this.isNeedZoomIn;
     };
 
     //获取图片真实大小
-    zoom.prototype.getRealSize = function (cb){
+    zoom.prototype.getRealSize = function (cb) {
         var proxy = this;
-        $("<img/>").attr("src", this.src).load(function(){
+        $("<img/>").attr("src", this.src).load(function () {
             proxy.realSize = {
                 width: this.width,
                 height: this.height
@@ -66,20 +66,20 @@
     };
 
     //修正尺寸
-    zoom.prototype.fixSize = function(){
-        if(this.realSize.height <= this.containerSize.height){
-            if(this.realSize.width <= this.containerSize.width){
+    zoom.prototype.fixSize = function () {
+        if (this.realSize.height <= this.containerSize.height) {
+            if (this.realSize.width <= this.containerSize.width) {
                 this.isNeedZoomIn = false; //不需要缩放
             }
-            else{
+            else {
                 this.fixWidth();
             }
         }
-        else{
-            if(this.realSize.width > this.container.width * this.realSize.height / this.containerSize.height){
+        else {
+            if (this.realSize.width > this.container.width * this.realSize.height / this.containerSize.height) {
                 this.fixWidth();
             }
-            else{
+            else {
                 this.fixHeight();
             }
         }
@@ -92,7 +92,7 @@
     };
 
     // too wide
-    zoom.prototype.fixWidth = function(){
+    zoom.prototype.fixWidth = function () {
         this.fixedSize = {
             width: this.containerSize.width,
             height: this.containerSize.width / this.realSize.width * this.realSize.height
@@ -100,28 +100,28 @@
     };
 
     // too tall
-    zoom.prototype.fixHeight = function(){
+    zoom.prototype.fixHeight = function () {
         this.fixedSize = {
             width: this.containerSize.height / this.realSize.height * this.realSize.width,
             height: this.containerSize.height
         };
     };
 
-    zoom.prototype.loadImage = function(){
+    zoom.prototype.loadImage = function () {
         this.img
             .attr("src", this.src)
             .attr('width', this.fixedSize.width)
             .attr('height', this.fixedSize.height);
     };
 
-    zoom.prototype.handleDblClick = function(){
+    zoom.prototype.handleDblClick = function () {
         var proxy = this;
-        this.img.dblclick(function(e){
-            if(proxy.isZoomIn){
+        this.img.dblclick(function (e) {
+            if (proxy.isZoomIn) {
                 //zoom out
                 proxy.zoomOut();
             }
-            else{
+            else {
                 var posX = $(this).offset().left;
                 var posY = $(this).offset().top;
                 var offsetX = e.pageX - posX;
@@ -139,24 +139,30 @@
         });
     };
 
-    zoom.prototype.handleResize = function(){
-        $(window).resize(function(e){
+    zoom.prototype.handleResize = function () {
+        $(window).resize(function (e) {
             console.log("resize");
         });
     };
 
-    zoom.prototype.zoomOut = function(){
+    zoom.prototype.zoomOut = function () {
         this.img.animate({
             width: this.fixedSize.width,
             height: this.fixedSize.height
         }, this.animate);
         this.container.animate({
-            scrollTop: 0,
-            scrollLeft: 0
+            scrollLeft: 0,
+            scrollTop: 0
         }, this.animate);
     };
 
-    zoom.prototype.zoomIn = function(scrollLeft, scrollTop){
+    zoom.prototype.zoomIn = function (scrollLeft, scrollTop) {
+        if(scrollLeft < 0){
+            scrollLeft = 0;
+        }
+        if(scrollTop < 0){
+            scrollTop = 0;
+        }
         this.img.animate({
             width: this.realSize.width,
             height: this.realSize.height
@@ -167,6 +173,12 @@
         }, this.animate);
     };
 
-
-    $.zoom = zoom;
+    $.zoom = function(options, cb){
+        var zoomer = new zoom(options);
+        zoomer.done(function(){
+            cb({
+                getPosition: zoomer.getPosition
+            });
+        });
+    };
 }(jQuery));
